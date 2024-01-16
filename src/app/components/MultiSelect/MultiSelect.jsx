@@ -60,16 +60,16 @@ const MultiSelect = ({ items }) => {
         setRemovalIndex(null); // Reset removal index after removal
       }
     }
-    else if (event.key === 'Enter') {
-      // If Enter is pressed, check if the filter text exactly matches any item
-      const exactMatchIndex = items.findIndex(
-        (item) => item.toLowerCase() === filterText.toLowerCase()
-      );
+  };
 
-      if (exactMatchIndex !== -1) {
-        // If there's an exact match, add it
-        handleItemClick(items[exactMatchIndex]);
-      }
+  const handleEnter = () => {
+    // If Enter is pressed, check if the filter text exactly matches any item
+    const exactMatch = items.find(
+      (item) => item.toLowerCase() === filterText.toLowerCase()
+    );
+
+    if (exactMatch) {
+      handleItemClick(exactMatch);
     }
   };
 
@@ -95,27 +95,30 @@ const MultiSelect = ({ items }) => {
 
   return (
     <>
-      <div className="" ref={listItemsRef}>
+      <div className="lg:w-[600px] md:w-[500px] sm:w-[500px] w-full" ref={listItemsRef}>
 
-        <div className="flex  items-center border rounded-lg shadow-md p-2">
-          <div className="flex w-fit gap-3">
+        <div className="flex flex-row justify-center gap-1 items-center rounded-lg shadow-md p-2 bg-white ring-2 ring-purple-900 dark:ring-neutral-300 dark:bg-neutral-700 w-full">
+          <div className="flex flex-row flex-wrap w-full gap-3">
             {selectedItems.map((selectedItem, index) => (
               <div
                 key={index}
-                className={`${index === removalIndex ? 'bg-blue-800' : 'bg-blue-500'}  flex gap-3 items-center text-white p-2 rounded-md `}
+                className={`${index === removalIndex && filterText == "" ? 'bg-purple-800 ring-1 ring-purple-950 ring-offset-2' : 'bg-purple-500'} flex gap-3 items-center text-white p-2 rounded-md`}
               >
                 {selectedItem}
                 <span className='cursor-pointer' onClick={() => handleRemoveItem(selectedItem)}>&#10005;</span>
               </div>
+              
             ))}
+            <input value={filterText} onKeyDown={(event) => { if (event.key == "Backspace" && filterText == '') { handleBackspace(event) } else if (event.key == "Enter") { handleEnter(event) } }} onChange={(e) => setFilterText(e.target.value)} className={`p-2 outline-none ${selectedItems.length > 0 ? 'w-fit' : 'w-full'} dark:bg-neutral-700`} onClick={handleItemBox} />
           </div>
-          <input value={filterText} onKeyDown={handleBackspace} onChange={(e) => setFilterText(e.target.value)} className="w-full p-2 outline-none" onClick={handleItemBox} />
+            
+          
         </div>
 
         <AnimatePresence>
           {isOpen && filteredItems.length > 0 && (
             <motion.div
-              className="left-0 w-full bg-white border rounded-md mt-2"
+              className="left-0 w-full bg-gray-200 shadow-lg dark:bg-gray-700 rounded-xl mt-2 p-1 overflow-auto h-fit max-h-40"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -123,7 +126,7 @@ const MultiSelect = ({ items }) => {
             >
               {/* Render your list items here */}
               {filteredItems.map((item, index) => (
-                <div key={item} onClick={() => handleItemClick(item)} className="p-2 hover:bg-gray-100">
+                <div key={index} onClick={() => handleItemClick(item)} className="p-2 hover:bg-gray-300 dark:hover:bg-slate-500 cursor-pointer rounded-lg">
                   {item}
                 </div>
               ))}
